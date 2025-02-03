@@ -1,0 +1,215 @@
+<div>
+
+  <button mat-button [matMenuTriggerFor]="menu"><i class="bi bi-plus-circle"></i></button>
+  <mat-menu #menu="matMenu">
+    @if((chainedCurlList$ | async) != null) {
+    @for(item of (chainedCurlList$ | async); track item;) {
+    <button (click)="confClick(item)" mat-menu-item>{{item}}</button>
+    }
+    }
+  </mat-menu>
+</div>
+
+<mat-tab-group [selectedIndex]="selectedTabIndex" (selectedIndexChange)="changeTabIndex($event)" animationDuration="0ms" class="allow-tab-events">
+  @for (tab of (tabChainedCurls$ | async) | keyvalue: asIsOrder; track tab; let index = $index) {
+  <mat-tab [label]="tab.value['assetName']">
+    <ng-template mat-tab-label>
+      <mat-icon (click)="closeTab(tab.value.contextId)" class="example-tab-icon">clear</mat-icon>
+      {{tab.value['assetName']}}
+    </ng-template>
+    @if (tab.value == selected) {
+    <div class="container">
+      <div class="row mt-4">
+        <div class="col mb-2">
+          <!-- <div class="example-action-buttons">
+              <button mat-button (click)="accordion().openAll()">Expand All</button>
+              <button mat-button (click)="accordion().closeAll()">Collapse All</button>
+            </div> -->
+          <mat-accordion class="example-headers-align" multi>
+            <mat-expansion-panel class="mb-3" [expanded]="isProvideOpened(tab.value.contextId)" 
+              (opened)="setProvideOpenStatus(tab.value.contextId, true)"
+              (closed)="setProvideOpenStatus(tab.value.contextId, false)">
+              <mat-expansion-panel-header>
+                <mat-panel-title> Initial data </mat-panel-title>
+                <mat-panel-description>
+                  See initial data
+                  <mat-icon>account_circle</mat-icon>
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <div class="row row-cols-3 p-2 h5" style="background-color: antiquewhite;">
+                <div class="col-12">
+                  <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                      <li class="breadcrumb-item active" aria-current="page">Fixes</li>
+                    </ol>
+                  </nav>
+                </div>
+
+                @for (item of tab.value['serverConfig']['initialValues']['fixes'] | keyvalue; track item;) {
+                <div class="col">
+                  <mat-form-field>
+                    <mat-label>{{item.key}}</mat-label>
+                    <input matInput [value]="item.value" disabled="true" />
+                  </mat-form-field>
+                </div>
+                }
+              </div>
+
+              <div class="row row-cols-3 mt-2 p-2" style="background-color: #bcdddd;">
+                <div class="col-12">
+                  <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                      <li class="breadcrumb-item active h5" aria-current="page">suppliers</li>
+                    </ol>
+                  </nav>
+                </div>
+
+                @for (item of tab.value['serverConfig']['initialValues']['suppliers'] | keyvalue; track item;) {
+                <div class="col">
+                  <mat-form-field>
+                    <mat-label>{{item.key}}</mat-label>
+                    <input matInput [value]="item.value" disabled="true" />
+                  </mat-form-field>
+                </div>
+                }
+              </div>
+            </mat-expansion-panel>
+
+            <!-- steps -->
+            @for (item of tab.value.serverConfig.chainedCurlDto.chain | keyvalue: asIsOrder; track item; let idx = $index) {
+            <mat-expansion-panel [expanded]="isStepOpened(tab.value.contextId, item.key)" 
+              (opened)="setStepOpenStatus(tab.value.contextId, item.key, true)"
+              (closed)="setStepOpenStatus(tab.value.contextId, item.key, false)">
+              <mat-expansion-panel-header>
+                <mat-panel-title> Step {{idx + 1}} </mat-panel-title>
+                <mat-panel-description>
+                  {{item.key}}
+                  <mat-icon>extension</mat-icon>
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <div style="border: 1px solid gray; margin: 5px 4px 10px; padding: 5px 18px; border-radius: 8px; background-color: beige;">
+                @for (c of item.value.curl; track c;) {
+                  <p>{{c}}</p>
+                }
+              </div>
+              
+              @if (item.value.provide && item.value.provide.supplier && tab.value.serverConfig.contextMap &&
+              tab.value.serverConfig.contextMap[item.key] && tab.value.serverConfig.contextMap[item.key].suppliers) {
+              @for (im of tab.value.serverConfig.contextMap[item.key].suppliers | keyvalue; track im;) {
+              <div class="col">
+                <mat-form-field>
+                  <mat-label>{{im.key}}</mat-label>
+                  <input matInput [value]="im.value" disabled="true" />
+                </mat-form-field>
+              </div>
+              }
+              }
+
+              @if (item.value.provide && item.value.provide.fix && tab.value.serverConfig.contextMap &&
+                tab.value.serverConfig.contextMap[item.key] && tab.value.serverConfig.contextMap[item.key].fixes) {
+                <!-- <p>{{stringify3(chainedCurlDto.contextMap[item.key].fixes)}}</p> -->
+                @for (im of tab.value.serverConfig.contextMap[item.key].fixes | keyvalue; track im;) {
+                <div class="col">
+                  <mat-form-field>
+                    <mat-label>{{im.key}}</mat-label>
+                    <input matInput [value]="im.value" disabled="true" />
+                  </mat-form-field>
+                </div>
+                }
+                }
+
+                @if (item.value.provide && item.value.provide.input) {
+                  <form class="row row-cols-3" [formGroup]="getFormGroup(tab.value.contextId, item.key)">
+                    @for (inp of item.value.provide.input | keyvalue; track inp; let jdx = $index) {
+                    <div class="col">
+                      <mat-form-field>
+                        <mat-label>{{inp.key}}
+                          @if (inp.value['type'] === 'prev-step') {
+                          <mat-icon matSuffix [matTooltip]="inp.value['expression']">help_outline</mat-icon>
+                          }
+                        </mat-label>
+                        @switch (inp.value['type']) {
+                        @case ('text') {
+                        <input matInput [type]="'text'" formControlName="{{inp.key}}" />
+                        }
+                        @case ('prev-step') {
+                          <input matInput [type]="'text'" formControlName="{{inp.key}}" readonly/>
+                        }
+                        }
+                      </mat-form-field>
+                    </div>
+                    }
+                  </form>
+                }
+
+                @if (checkIfRequiredPrevStepValues(tab.value.contextId, item.key)) {
+                <div class="col-12">
+                  <button class="btn btn-primary" >fill from PrevSteps</button>
+                </div>
+                }
+
+                <div class="col-12">
+                  <button class="btn btn-primary" (click)="submitForm(tab.value.contextId, item.key)">Submit</button>
+                </div>
+
+                @if ((chainedCurlResponseMapChanged$ | async) && (chainedCurlResponseMap$ | async)[tab.value.contextId] && (chainedCurlResponseMap$ | async)[tab.value.contextId][item.key]) {
+                  <div class="col-12 mt-2">
+                    <label for="{{item.key}}-curl" class="form-label">CURL</label>
+                    <textarea id="{{item.key}}-curl" class="form-control" type="text" rows="8" disabled="true">
+                            {{(chainedCurlResponseMap$ | async)[tab.value.contextId][item.key].curlRequest}}
+                          </textarea>
+                    <label for="{{item.key}}-status" class="form-label">Response Status</label>
+                    <input id="{{item.key}}-status" class="form-control" type="text" disabled="true"
+                      value="{{(chainedCurlResponseMap$ | async)[tab.value.contextId][item.key].status}}" />
+                    <label for="{{item.key}}-body" class="form-label mt-1">Response Body</label>
+                    <textarea class="form-control" id="{{item.key}}-body" rows="10" disabled="true">
+                            {{stringify((chainedCurlResponseMap$ | async)[tab.value.contextId][item.key].bodyAsString)}}
+                          </textarea>
+                  </div>
+        
+                  @if ((chainedCurlResponseMap$ | async)[tab.value.contextId][item.key].showControls) {
+                    @for (ctrlMap of (chainedCurlResponseMap$ | async)[tab.value.contextId][item.key].showControls | keyvalue; track ctrlMap; let jdx = $index) {
+                      <div class="col">
+                        @if (ctrlMap.value.hasOwnProperty('type') && ctrlMap.value['type'] === 'image') {
+                          <img src="{{ctrlMap.value['src']}}" width="{{ctrlMap.value['width']}}" height="{{ctrlMap.value['height']}}" class="img-thumbnail"/>
+                        }
+                      </div>
+                    }
+                  }
+                }
+            </mat-expansion-panel>
+            }
+          </mat-accordion>
+        </div>
+      </div>
+    </div>
+    }
+  </mat-tab>
+  }
+</mat-tab-group>
+
+
+<div class="container mt-3">
+  <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+    <div class="col-md-4 d-flex align-items-center">
+      <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
+        <svg class="bi" width="30" height="24">
+          <use xlink:href="#bootstrap"></use>
+        </svg>
+      </a>
+      <span class="mb-3 mb-md-0 text-body-secondary">© 2024 Company, Inc</span>
+    </div>
+
+    <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+      <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24">
+            <use xlink:href="#twitter"></use>
+          </svg></a></li>
+      <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24">
+            <use xlink:href="#instagram"></use>
+          </svg></a></li>
+      <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24">
+            <use xlink:href="#facebook"></use>
+          </svg></a></li>
+    </ul>
+  </footer>
+</div>

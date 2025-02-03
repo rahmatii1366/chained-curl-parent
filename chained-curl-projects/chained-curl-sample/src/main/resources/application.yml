@@ -1,0 +1,20 @@
+chained-curl:
+  controller:
+    enabled: true
+db:
+  name: gateway_db
+  port: 26257
+server:
+  port: 9092
+spring:
+  application:
+    name: direct-debit-client
+  datasource:
+    url: jdbc:postgresql://localhost:${db.port}/${db.name}
+    username: jibit
+    password: pass
+    driverClassName: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 40
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect

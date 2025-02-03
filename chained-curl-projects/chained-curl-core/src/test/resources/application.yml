@@ -1,0 +1,10 @@
+datasource:
+#  jdbcUrl: jdbc:postgresql://localhost:26257/gateway_db
+#  username: jibit
+#  password: pass
+#  driverClassName: org.postgresql.Driver
+  jdbcUrl: jdbc:h2:mem:testdb
+  username: sa
+  password: password
+  driverClassName: org.h2.Driver
+  maximumPoolSize: 40

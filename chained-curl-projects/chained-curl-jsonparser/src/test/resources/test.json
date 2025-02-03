@@ -1,0 +1,26 @@
+[
+  {
+    "name": "John",
+    "family": "Doi",
+    "addresses": [
+      {
+        "title": "home",
+        "plaque": 1
+      },
+      {
+        "title": "work",
+        "plaque": 2
+      }
+    ],
+    "parent": {
+      "is-legal": false,
+      "man": null,
+      "name": "hasan",
+      "national-code": "0082315310",
+      "work": {
+        "title": "ibm",
+        "responsibility": "cto"
+      }
+    }
+  }
+]

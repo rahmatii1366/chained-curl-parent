@@ -1,0 +1,3 @@
+spring:
+  validator:
+    locale: fa

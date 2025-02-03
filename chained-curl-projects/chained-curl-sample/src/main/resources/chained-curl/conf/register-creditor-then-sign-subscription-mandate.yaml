@@ -1,0 +1,100 @@
+name: 'register-creditor-then-sign-subscription-mandate'
+provide:
+  supplier:
+    ledger-id: ledgerIdSupplier
+    merchant-name: merchantNameSupplier
+    merchant-code: merchantCodeSupplier
+    redirect-url: redirectUrlSupplier
+  fix:
+    mandateStartDate: 'as-date&now&as-persian-date&format:yyMMdd'
+    mandateEndDate: 'as-date&now&as-persian-date&plus:year:1&format:yyMMdd'
+chain:
+  authenticate:
+    provide:
+      input:
+        apiKey:
+          type: text
+          pattern: ^[a-zA-Z0-9_]*$
+          length: 8
+        secretKey:
+          type: text
+    curl:
+      - '-X POST http://localhost:8083/api/v1/auth/authenticate'
+      - '-H Content-Type: application/json'
+      - '-d $(body:{ "apiKey": "$(input#apiKey#as-string)", "secretKey": "$(input#secretKey#as-string)" })'
+      #    - $(file:authenticate.json)
+    continueConditions:
+      - '$(status:200)'
+  creditor-register:
+    provide:
+      supplier:
+        merchant-code: merchantCodeSupplier
+    startConditions:
+      - '$(status#authenticate#as-int#equal:200)'
+    curl:
+      - '-X POST http://localhost:8083/api/v1/creditor/register'
+      - '-H Content-Type: application/json'
+      - '-H Authorization: Bearer $(res-json#authenticate:access_token#as-string)'
+      - '-d $(body:{ "merchantCode": "$(supplier#merchant-code#as-string)", "merchantFullName": "$(supplier#provide:merchant-name#as-string)", "ledgerId": "$(supplier#provide:ledger-id#as-string)", "merchantName": "$(supplier#provide:merchant-name#as-string)", "redirectUrl": "$(supplier#provide:redirect-url#as-string)", "settlementInterval": 4 })'
+    continueConditions:
+      - '$(status:200)'
+    extract:
+      apiKey: '$(res-json#apiKey#as-string)'
+  authenticate-creditor:
+    curl:
+      - '-X POST http://localhost:8083/api/v1/auth/authenticate'
+      - '-H Content-Type: application/json'
+      - '-d $(body:{ "apiKey": "$(extracted#creditor-register:apiKey#as-string)", "secretKey": "$(res-json#creditor-register:secretKey#as-string)" })'
+    continueConditions:
+      - '$(status:200)'
+  initiate-mandate:
+    startConditions:
+      - '$(status#authenticate-creditor:200)'
+    curl:
+      - '-X POST http://localhost:8083/api/v1/mandate/initiate/subscription'
+      - '-H Content-Type: application/json'
+      - '-H Authorization: Bearer $(res-json#authenticate-creditor:access_token#as-string)'
+      - '-d $(body:{"reference":"90238402384021000","frequency":2,"period":1,"periodUnit":"1","maximumAmount":100000,"startDate":"$(fix#provide:mandateStartDate#as-string)","expireDate":"$(fix#provide:mandateEndDate#as-string)","mandateReason":"test","debtorBank":"AYANDEH","otpStatus":"DISABLE", retry: false})'
+    continueConditions:
+      - '$(status:200)'
+  captcha:
+    startConditions:
+      - '$(status#initiate-mandate:200)'
+    curl:
+      - '-X POST http://localhost:8081/api/v1/auth/captcha/$(res-json#initiate-mandate:redirectUrl#as-url&last-section)'
+      - '-H Content-Type: application/json'
+    extract:
+      image: $(res-json#captcha#as-string)
+    show:
+      captcha-image:
+        type: image
+        src: data:image/png; base64,$(extracted#image#as-string)
+        width: 200
+        height: 50
+        style: ''
+        class: ''
+  pre-sign:
+    provide:
+      input:
+        captcha:
+          type: text
+          max-length: 5
+          pattern: ''
+    curl:
+      - '-X POST http://localhost:8081/api/v1/mandate/pre-sign'
+      - '-H Content-Type: application/json'
+      - '-H Creditor-Token: $(res-json#initiate-mandate:redirectUrl#as-url&last-section)'
+      - '-d $(body:{ "cardNumber": "6362141133490657", "captcha": "$(input#captcha#as-string)" })'
+    continueConditions:
+      - '$(status:200)'
+  sign:
+    curl:
+      - '-X PUT http://localhost:8081/api/v1/mandate/sign'
+      - '-H Content-Type: application/json'
+      - '-H Creditor-Token: $(res-json#initiate-mandate:redirectUrl#as-url&last-section)'
+      - '-d $(body:{ "otp": "1111111", "cardNumber": "6362141133490657", "cardExpireDate": "1010", "cvv2": "123" })'
+  verify:
+    curl:
+      - '-X POST http://localhost:8083/api/v1/mandate/singed/notify'
+      - '-H Content-Type: application/json'
+      - '-H Creditor-Token: $(res-json#initiate-mandate:redirectUrl#as-url&last-section)'

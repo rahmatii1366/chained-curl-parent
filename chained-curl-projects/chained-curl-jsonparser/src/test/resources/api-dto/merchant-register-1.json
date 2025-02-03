@@ -1,0 +1,56 @@
+{
+  "businessCategoyCode": 5944,
+  "businessName": "inquiry12",
+  "businessSubCategoryCode": 4,
+  "ips": ["31.31.124.131"],
+  "merchantAdditionalDataDtos": [
+    {
+      "accountNumber": 203477726448,
+      "addOrRemove": 1,
+      "iban": "IR410620000222103499926001"
+    }
+  ],
+  "merchantUrl": "https://piana.ir",
+  "pardakhtyarMerchantId": 4783562,
+  "personInforamtionDto": {
+    "birthCrtfctNumber": 320,
+    "birthCrtfctSerial": 0,
+    "birthCrtfctSeriesLetter": "A",
+    "birthCrtfctSeriesNumber": 0,
+    "cellPhoneNumber": "09122121413",
+    "comNameEn": "asef",
+    "comNameFa": "عاصف",
+    "commercialCode": "",
+    "countryCode": "IR",
+    "emailAddress": "info@piana.ir",
+    "fax": "",
+    "merchantType": "Legal",
+    "nationalLegalCode": "14006314500",
+    "officers": [
+      {
+        "residencyType": "Iranian",
+        "vitalStatus": "Live",
+        "firstNameFa": "محمدمهدي",
+        "lastNameFa": "رحمتی",
+        "fatherNameFa": "قاسم",
+        "firstNameEn": "Mohammad Mahdi",
+        "lastNameEn": "rahmati",
+        "fatherNameEn": "ghasem",
+        "birthDate": 13640721,
+        "telephoneNumber": "021-55541328",
+        "nationalCode": "0084342212",
+        "gender": "Male",
+        "merchantType": "Real",
+        "cellPhoneNumber": "09114352490"
+      }
+    ],
+    "passportExpireDate": "2022-10-31T09:00:00.594Z",
+    "passportNumber": 0,
+    "registerDate": "2019-11-21T08:00:00.201Z",
+    "registerNumber": "501136",
+    "residencyType": "Iranian",
+    "telephoneNumber": "021-55451332",
+    "vitalStatus": "Live",
+    "webSite": "https://www.piana.ir"
+  }
+}

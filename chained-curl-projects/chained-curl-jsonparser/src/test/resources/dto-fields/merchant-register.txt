@@ -1,0 +1,44 @@
+businessCategoyCode number nn nbe#1000#10000
+businessName string nn lb#8#10
+businessSubCategoryCode number nn
+ips
+merchantAdditionalDataDtos[0].accountNumber number nn
+merchantAdditionalDataDtos[0].addOrRemove number nn
+merchantAdditionalDataDtos[0].iban string nn
+merchantUrl string nn
+pardakhtyarMerchantId number nn
+personInforamtionDto.birthCrtfctNumber
+personInforamtionDto.birthCrtfctSerial
+personInforamtionDto.birthCrtfctSeriesLetter string nn
+personInforamtionDto.birthCrtfctSeriesNumber
+personInforamtionDto.cellPhoneNumber string nn
+personInforamtionDto.comNameEn string nn
+personInforamtionDto.comNameFa string nn
+personInforamtionDto.commercialCode string nn
+personInforamtionDto.countryCode string nn
+personInforamtionDto.emailAddress string nn
+personInforamtionDto.fax string nn
+personInforamtionDto.merchantType string nn
+personInforamtionDto.nationalLegalCode string nn
+personInforamtionDto.officers[0].residencyType string nn
+personInforamtionDto.officers[0].vitalStatus string nn
+personInforamtionDto.officers[0].firstNameFa string nn
+personInforamtionDto.officers[0].lastNameFa string nn
+personInforamtionDto.officers[0].fatherNameFa string nn
+personInforamtionDto.officers[0].firstNameEn string nn
+personInforamtionDto.officers[0].lastNameEn string nn
+personInforamtionDto.officers[0].fatherNameEn string nn
+personInforamtionDto.officers[0].birthDate
+personInforamtionDto.officers[0].telephoneNumber string nn
+personInforamtionDto.officers[0].nationalCode string nn
+personInforamtionDto.officers[0].gender string nn
+personInforamtionDto.officers[0].merchantType string nn
+personInforamtionDto.officers[0].cellPhoneNumber string nn
+personInforamtionDto.passportExpireDate string nn
+personInforamtionDto.passportNumber
+personInforamtionDto.registerDate string nn
+personInforamtionDto.registerNumber string nn
+personInforamtionDto.residencyType string nn
+personInforamtionDto.telephoneNumber string nn
+personInforamtionDto.vitalStatus string nn
+personInforamtionDto.webSite string nn
